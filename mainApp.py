@@ -1,21 +1,25 @@
 import sys
 import os
 import vlc
+import eyed3
+
 from PyQt6.QtWidgets import QApplication, QWidget, QLabel, QPushButton, QVBoxLayout, QComboBox
 
 os.add_dll_directory(r"C:\Users\Joeyb\Documents\music player\music-player")
+
 
 class MusicPlayer(QWidget):
     def __init__(self):
         super().__init__()
         self.setWindowTitle("Basic Music Player")
         self.resize(800, 600)
-
-        self.label = QLabel("Title Name")
         
-        self.label = QLabel("Select a song:")
+        self.label = QLabel("Select a song")
         self.dropdown = QComboBox()
         self.load_songs()
+        
+        # self.backgroundPicture = QLabel()
+        # self.backgroundPicture.pixmap(os.path.)
         
         self.button = QPushButton("Play")
         
@@ -40,6 +44,22 @@ class MusicPlayer(QWidget):
 
     def play_music(self):
         selected_item = self.dropdown.currentText()
+        
+        # set metadata
+        
+        audioFile = eyed3.load(selected_item)
+        
+        if audioFile.tag is not None:
+            artist = audioFile.tag.artist
+            album = audioFile.tag.album,
+            title = audioFile.tag.title
+            
+            self.label.setText(title)
+        else:
+            print("This song has no metadata attached to it.")
+            self.label.setText(selected_item)
+
+        
         media = self.instance.media_new(selected_item)
         self.player.set_media(media)
         self.player.play()
