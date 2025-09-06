@@ -5,7 +5,7 @@ import eyed3
 
 from PyQt6.QtWidgets import QApplication, QWidget, QLabel, QPushButton, QVBoxLayout, QComboBox
 
-os.add_dll_directory(r"C:\Users\Joeyb\Documents\music player\music-player")
+os.add_dll_directory(os.path.dirname(os.path.abspath(__name__)))
 
 
 class MusicPlayer(QWidget):
