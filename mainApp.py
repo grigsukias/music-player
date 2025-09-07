@@ -4,6 +4,8 @@ import vlc
 import eyed3
 
 from PyQt6.QtWidgets import QApplication, QWidget, QLabel, QPushButton, QVBoxLayout, QComboBox
+from PyQt6.QtCore import QByteArray, QBuffer, Qt
+from PyQt6.QtGui import QPixmap
 
 os.add_dll_directory(os.path.dirname(os.path.abspath(__name__)))
 
@@ -18,8 +20,8 @@ class MusicPlayer(QWidget):
         self.dropdown = QComboBox()
         self.load_songs()
         
-        # self.backgroundPicture = QLabel()
-        # self.backgroundPicture.pixmap(os.path.)
+        self.backgroundPicture = QLabel()
+        self.backgroundPicture.pixmap()
         
         self.button = QPushButton("Play")
         
@@ -28,6 +30,7 @@ class MusicPlayer(QWidget):
         layout.addWidget(self.label)
         layout.addWidget(self.button)
         layout.addWidget(self.dropdown)
+        layout.addWidget(self.backgroundPicture)
         self.setLayout(layout)
 
         self.instance = vlc.Instance()
@@ -53,6 +56,28 @@ class MusicPlayer(QWidget):
             artist = audioFile.tag.artist
             album = audioFile.tag.album,
             title = audioFile.tag.title
+            image = None
+            
+            if audioFile.tag is not None and audioFile.tag.images:
+                image = audioFile.tag.images[0].image_data  # <-- here’s your variable
+                pixmap = QPixmap()
+                byte_array = QByteArray(image)
+                buffer = QBuffer(byte_array)
+                buffer.open(QBuffer.OpenModeFlag.ReadOnly)
+                pixmap.loadFromData(buffer.data())
+                
+                pixmap = pixmap.scaled(
+                      self.backgroundPicture.width(),
+                      self.backgroundPicture.height(),
+                      Qt.AspectRatioMode.KeepAspectRatio,
+                      Qt.TransformationMode.SmoothTransformation
+                    )
+
+    
+                self.backgroundPicture.setPixmap(pixmap)
+            else:
+                image = None
+                self.backgroundPicture.clear()
             
             self.label.setText(title)
         else:
